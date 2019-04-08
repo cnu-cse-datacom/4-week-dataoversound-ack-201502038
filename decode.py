@@ -34,11 +34,11 @@ def play_sound(byte_stream):
     List.append(HANDSHAKE_END_HZ)
     #print(List)
     p = pyaudio.PyAudio()
-    stream = p.open(format=pyaudio.paFloat32,channels=1,rate=44100,output = True)
+    stream = p.open(format=pyaudio.paFloat32,channels=1,rate=18000,output = True)
     for a in List:
-        print("freq:")
+        print("freq :",end='')
         print(a)
-        sample = np.sin(2*np.pi*np.arange(44100*0.5)*a/44100).astype(np.float32)
+        sample = np.sin(2*np.pi*np.arange(18000*0.8)*a/18000).astype(np.float32)
         stream.write(sample)
     
 def stereo_to_mono(input_file, output_file):
@@ -183,8 +183,8 @@ def listen_linux(frame_rate=44100, interval=0.1):
                 byte_stream = byte_stream.decode("utf-8")
                 if int(byte_stream[0:9]) == 201502038 :
                     display(byte_stream[9:])
-                display("")
-                play_sound(byte_stream[9:])
+                    display("")
+                    play_sound(byte_stream[9:])
             except ReedSolomonError as e:
                 print("{}: {}".format(e, byte_stream))
 
