@@ -27,18 +27,22 @@ def play_sound(byte_stream):
     List = [];
     List.append(HANDSHAKE_START_HZ)
     for i in ary:
-        List.append(((int(ord(i)) >> 4)*STEP_HZ)+START_HZ)
-        List.append(((int(ord(i)) >> 4)*STEP_HZ)+START_HZ)
-        List.append(((int(ord(i)) & 0xf)*STEP_HZ)+START_HZ)
-        List.append(((int(ord(i)) & 0xf)*STEP_HZ)+START_HZ)
+        if type(i) == int :
+            List.append(((int(i) >> 4)*STEP_HZ)+START_HZ)
+            List.append(((int(i) >> 4)*STEP_HZ)+START_HZ)
+            List.append(((int(i) & 0xf)*STEP_HZ)+START_HZ)
+            List.append(((int(i) & 0xf)*STEP_HZ)+START_HZ)
+        else :
+            List.append(((int(ord(i)) >> 4)*STEP_HZ)+START_HZ)
+            List.append(((int(ord(i)) & 0xf)*STEP_HZ)+START_HZ)
     List.append(HANDSHAKE_END_HZ)
-    #print(List)
+    print(List)
     p = pyaudio.PyAudio()
     stream = p.open(format=pyaudio.paFloat32,channels=1,rate=18000,output = True)
     for a in List:
         print("freq :",end='')
         print(a)
-        sample = np.sin(2*np.pi*np.arange(18000*0.8)*a/18000).astype(np.float32)
+        sample = np.sin(2*np.pi*np.arange(18000*0.35)*a/18000).astype(np.float32)
         stream.write(sample)
     
 def stereo_to_mono(input_file, output_file):
@@ -91,7 +95,7 @@ def match(freq1, freq2):
 
 def decode_bitchunks(chunk_bits, chunks):
     out_bytes = []
-
+    print(chunks)
     next_read_chunk = 0
     next_read_bit = 0
 
@@ -181,10 +185,18 @@ def listen_linux(frame_rate=44100, interval=0.1):
             try:
                 byte_stream = RSCodec(FEC_BYTES).decode(byte_stream)
                 byte_stream = byte_stream.decode("utf-8")
+                print(byte_stream)
                 if int(byte_stream[0:9]) == 201502038 :
+                    print(byte_stream[0:9],end='')
+                    print(" ",end='')
+                    print(byte_stream[9:])
                     display(byte_stream[9:])
                     display("")
-                    play_sound(byte_stream[9:])
+                    byte_stream = byte_stream[9:]
+                    byte_stream = byte_stream.encode("utf-8")
+                    byte_stream = RSCodec(FEC_BYTES).encode(byte_stream)
+                    print(byte_stream)
+                    play_sound(byte_stream)
             except ReedSolomonError as e:
                 print("{}: {}".format(e, byte_stream))
 
