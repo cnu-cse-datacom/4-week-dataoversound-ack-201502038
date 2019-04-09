@@ -42,7 +42,7 @@ def play_sound(byte_stream):
     for a in List:
         print("freq :",end='')
         print(a)
-        sample = np.sin(2*np.pi*np.arange(18000*0.35)*a/18000).astype(np.float32)
+        sample = np.sin(2*np.pi*np.arange(18000*0.4)*a/18000).astype(np.float32)
         stream.write(sample)
     
 def stereo_to_mono(input_file, output_file):
